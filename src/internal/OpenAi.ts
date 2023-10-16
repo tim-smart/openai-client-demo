@@ -1,6 +1,9 @@
 import * as Http from "@effect/platform-node/HttpClient"
-import { Schema } from "@effect/schema"
-import { Context, Effect, Layer, flow, identity } from "effect"
+import * as Schema from "@effect/schema/Schema"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import { flow, identity } from "effect/Function"
+import * as Layer from "effect/Layer"
 
 export interface OpenAIConfig {
   readonly apiKey: string

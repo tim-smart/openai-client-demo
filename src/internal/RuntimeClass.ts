@@ -1,4 +1,9 @@
-import { Context, Effect, Exit, Layer, Runtime, Scope } from "effect"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Exit from "effect/Exit"
+import * as Layer from "effect/Layer"
+import * as Runtime from "effect/Runtime"
+import * as Scope from "effect/Scope"
 
 export function RuntimeClass<Args extends Array<any>, RE, R>(
   layer: (...args: Args) => Layer.Layer<never, RE, R>,
