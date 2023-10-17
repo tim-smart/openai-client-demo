@@ -1,7 +1,4 @@
 import * as internal from "./internal/OpenAi"
-import { Model } from "./internal/OpenAi"
-
-export { Model, ModelId } from "./internal/OpenAi"
 
 export interface OpenAIConfig {
   readonly apiKey: string
@@ -14,3 +11,12 @@ export interface OpenAIClient {
 
 export const createClient: (config: OpenAIConfig) => OpenAIClient =
   internal.createClient
+
+export interface Model {
+  readonly object: string
+  readonly id: string
+  readonly created: Date
+  readonly owned_by: string
+  readonly root: string
+  readonly parent: string | null
+}

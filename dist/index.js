@@ -708,7 +708,6 @@ var right = (right3) => {
   a.right = right3;
   return a;
 };
-var getRight = (self) => isLeft(self) ? none : some(self.right);
 
 // node_modules/.pnpm/effect@2.0.0-next.48/node_modules/effect/Order/dist/effect-Order.esm.js
 var make2 = (compare) => (self, that) => self === that ? 0 : compare(self, that);
@@ -749,7 +748,6 @@ var match = /* @__PURE__ */ dual(2, (self, {
   onNone,
   onSome
 }) => isNone2(self) ? onNone() : onSome(self.value));
-var getRight2 = getRight;
 var getOrElse = /* @__PURE__ */ dual(2, (self, onNone) => isNone2(self) ? onNone() : self.value);
 var orElse = /* @__PURE__ */ dual(2, (self, that) => isNone2(self) ? that() : self);
 var fromNullable = (nullableValue) => nullableValue == null ? none2() : some2(nullableValue);
@@ -767,7 +765,6 @@ var right2 = right;
 var left2 = left;
 var isLeft2 = isLeft;
 var isRight2 = isRight;
-var mapLeft = /* @__PURE__ */ dual(2, (self, f) => isLeft2(self) ? left2(f(self.left)) : right2(self.right));
 var match2 = /* @__PURE__ */ dual(2, (self, {
   onLeft,
   onRight
@@ -916,9 +913,6 @@ var dedupeWith = /* @__PURE__ */ dual(2, (self, isEquivalent) => {
 });
 var dedupe = /* @__PURE__ */ dedupeWith(/* @__PURE__ */ equivalence());
 var join = /* @__PURE__ */ dual(2, (self, sep) => fromIterable2(self).join(sep));
-
-// node_modules/.pnpm/effect@2.0.0-next.48/node_modules/effect/Brand/dist/effect-Brand.esm.js
-var RefinedConstructorsTypeId = /* @__PURE__ */ Symbol.for("effect/Brand/Refined");
 
 // node_modules/.pnpm/effect@2.0.0-next.48/node_modules/effect/Chunk/dist/effect-Chunk.esm.js
 var TypeId3 = /* @__PURE__ */ Symbol.for("effect/Chunk");
@@ -9253,7 +9247,6 @@ var memoizeThunk = (f) => {
 };
 
 // node_modules/.pnpm/@effect+schema@0.43.2_effect@2.0.0-next.48_fast-check@3.13.1/node_modules/@effect/schema/AST/dist/effect-schema-AST.esm.js
-var BrandAnnotationId = /* @__PURE__ */ Symbol.for("@effect/schema/annotation/Brand");
 var TypeAnnotationId = /* @__PURE__ */ Symbol.for("@effect/schema/annotation/Type");
 var MessageAnnotationId = /* @__PURE__ */ Symbol.for("@effect/schema/annotation/Message");
 var IdentifierAnnotationId = /* @__PURE__ */ Symbol.for("@effect/schema/annotation/Identifier");
@@ -9473,13 +9466,6 @@ var createTypeLiteralTransformation = (propertySignatureTransformations) => {
     propertySignatureTransformations
   };
 };
-var mergeAnnotations = (ast, annotations) => ({
-  ...ast,
-  annotations: {
-    ...ast.annotations,
-    ...annotations
-  }
-});
 var getToPropertySignatures = (ps) => ps.map((p) => createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations));
 var getToIndexSignatures = (ps) => ps.map((is2) => createIndexSignature(is2.parameter, to(is2.type), is2.isReadonly));
 var to = (ast) => {
@@ -9826,10 +9812,6 @@ var getSync = (ast, isDecoding) => {
     return result.right;
   };
 };
-var getOption3 = (ast, isDecoding) => {
-  const parser = getEither(ast, isDecoding);
-  return (input, options3) => getRight2(parser(input, options3));
-};
 var getEffect = (ast, isDecoding) => {
   const parser = go2(ast, isDecoding);
   return (input, options3) => parser(input, {
@@ -9839,12 +9821,6 @@ var getEffect = (ast, isDecoding) => {
 };
 var parse = (schema) => getEffect(schema.ast, true);
 var validateSync = (schema) => getSync(to(schema.ast), true);
-var validateOption = (schema) => getOption3(to(schema.ast), true);
-var validateEither = (schema) => getEither(to(schema.ast), true);
-var is = (schema) => {
-  const getEither2 = validateEither(schema);
-  return (a) => isRight2(getEither2(a));
-};
 var encode = (schema) => getEffect(schema.ast, false);
 var defaultParseOption = {};
 var go2 = (ast, isDecoding) => {
@@ -10601,38 +10577,6 @@ var struct3 = (fields) => {
   }
   return make40(createTypeLiteral(pss, []));
 };
-var appendBrandAnnotation = (ast, brand2, options3) => {
-  if (isTransform(ast)) {
-    return createTransform(ast.from, appendBrandAnnotation(ast.to, brand2, options3), ast.transformation, ast.annotations);
-  }
-  const annotations = toAnnotations(options3);
-  annotations[BrandAnnotationId] = [...getBrands(ast), brand2];
-  return mergeAnnotations(ast, annotations);
-};
-var brand = (brand2, options3) => (self) => {
-  const ast = appendBrandAnnotation(self.ast, brand2, options3);
-  const schema = make40(ast);
-  const validateSync$1 = validateSync(schema);
-  const validateOption$1 = validateOption(schema);
-  const validateEither$1 = validateEither(schema);
-  const is$1 = is(schema);
-  const out = Object.assign((input) => validateSync$1(input), {
-    [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-    [TypeId13]: variance4,
-    ast,
-    option: (input) => validateOption$1(input),
-    either: (input) => mapLeft(validateEither$1(input), (e) => [{
-      meta: input,
-      message: formatErrors(e.errors)
-    }]),
-    is: (input) => is$1(input),
-    pipe() {
-      return pipeArguments(this, arguments);
-    }
-  });
-  return out;
-};
-var getBrands = (ast) => ast.annotations[BrandAnnotationId] || [];
 function filter7(predicate, options3) {
   return (self) => make40(createRefinement(self.ast, (a, _, ast) => predicate(a) ? none2() : some2(parseError([type(ast, a)])), toAnnotations(options3)));
 }
@@ -10672,20 +10616,6 @@ var toAnnotations = (options3) => {
   move("pretty", PrettyHookId);
   return out;
 };
-var MinLengthTypeId = /* @__PURE__ */ Symbol.for("@effect/schema/TypeId/MinLength");
-var minLength = (minLength2, options3) => (self) => self.pipe(filter7((a) => a.length >= minLength2, {
-  typeId: MinLengthTypeId,
-  description: `a string at least ${minLength2} character(s) long`,
-  jsonSchema: {
-    minLength: minLength2
-  },
-  ...options3
-}));
-var nonEmpty = (options3) => minLength(1, {
-  description: "a non empty string",
-  ...options3
-});
-var NonEmpty = /* @__PURE__ */ string4.pipe(/* @__PURE__ */ nonEmpty());
 var IntTypeId = /* @__PURE__ */ Symbol.for("@effect/schema/TypeId/Int");
 var int = (options3) => (self) => self.pipe(filter7((a) => Number.isSafeInteger(a), {
   typeId: IntTypeId,
@@ -13295,11 +13225,12 @@ var make48 = (config) => gen2(function* (_) {
         effect_platform_Http_ClientRequest_esm_exports.bearerToken(config.apiKey),
         config.organization ? effect_platform_Http_ClientRequest_esm_exports.setHeader("OpenAI-Organization", config.organization) : identity
       )
-    )
+    ),
+    effect_platform_Http_Client_esm_exports.filterStatusOk
   );
   const models = effect_platform_Http_ClientRequest_esm_exports.get("/models").pipe(
     client,
-    flatMap8(effect_platform_Http_ClientResponse_esm_exports.schemaBodyJson(ListResult(Model))),
+    flatMap8(effect_platform_Http_ClientResponse_esm_exports.schemaBodyJson(ListResult(ModelSchema))),
     map13((_2) => _2.data)
   );
   return { models };
@@ -13310,7 +13241,10 @@ var OpenAIClientImpl = class extends RuntimeClass(OpenAILive) {
   constructor(config) {
     super(config);
   }
-  models = this.$service(OpenAI, (_) => _.models);
+  models = this.$service(
+    OpenAI,
+    (_) => _.models
+  );
 };
 var createClient = (config) => new OpenAIClientImpl(config);
 var DateFromUnixTime = Int.pipe(
@@ -13325,9 +13259,8 @@ var ListResult = (schema) => struct3({
   data: array5(schema),
   has_more: optional(boolean3).withDefault(() => false)
 });
-var ModelId = NonEmpty.pipe(brand("ModelId"));
-var Model = class extends Class2()({
-  id: ModelId,
+var ModelSchema = class extends Class2()({
+  id: string4,
   object: string4,
   created: DateFromUnixTime,
   owned_by: string4,
@@ -13339,8 +13272,6 @@ var Model = class extends Class2()({
 // src/index.ts
 var createClient2 = createClient;
 
-exports.Model = Model;
-exports.ModelId = ModelId;
 exports.createClient = createClient2;
 //# sourceMappingURL=out.js.map
 //# sourceMappingURL=index.js.map
