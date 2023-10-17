@@ -11,7 +11,8 @@
     "lib": ["ESNext"],
     "downlevelIteration": true,
     "target": "ESNext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "stripInternal": true
   },
   "include": ["src/**/*"]
 }

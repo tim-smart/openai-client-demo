@@ -13245,49 +13245,6 @@ var fromWeb2 = fromWeb;
 var schemaJson2 = schemaJson;
 var schemaNoBody2 = schemaNoBody;
 
-// src/internal/OpenAi.ts
-var make48 = (config) => gen2(function* (_) {
-  const client = (yield* _(effect_platform_Http_Client_esm_exports.Client)).pipe(
-    effect_platform_Http_Client_esm_exports.mapRequest(
-      flow(
-        effect_platform_Http_ClientRequest_esm_exports.prependUrl("https://api.openai.com/v1"),
-        effect_platform_Http_ClientRequest_esm_exports.bearerToken(config.apiKey),
-        config.organization ? effect_platform_Http_ClientRequest_esm_exports.setHeader("OpenAI-Organization", config.organization) : identity
-      )
-    )
-  );
-  const models = effect_platform_Http_ClientRequest_esm_exports.get("/models").pipe(
-    client,
-    flatMap8(effect_platform_Http_ClientResponse_esm_exports.schemaBodyJson(ListResult(Model))),
-    map13((_2) => _2.data)
-  );
-  return { models };
-});
-var OpenAI = Tag("openai-demo/OpenAI");
-var OpenAILive = (config) => effect(OpenAI, make48(config)).pipe(use3(effect_platform_Http_Client_esm_exports.layer));
-var DateFromUnixTime = Int.pipe(
-  transform2(
-    DateFromSelf,
-    (_) => new Date(_ * 1e3),
-    (_) => Math.floor(_.getTime() / 1e3)
-  )
-);
-var ListResult = (schema) => struct3({
-  object: string4,
-  data: array5(schema),
-  has_more: optional(boolean3).withDefault(() => false)
-});
-var ModelId = NonEmpty.pipe(brand("ModelId"));
-var Model = class extends Class2()({
-  id: ModelId,
-  object: string4,
-  created: DateFromUnixTime,
-  owned_by: string4,
-  root: string4,
-  parent: nullable(string4)
-}) {
-};
-
 // src/internal/RuntimeClass.ts
 function RuntimeClass(layer2) {
   return class {
@@ -13329,16 +13286,61 @@ function RuntimeClass(layer2) {
   };
 }
 
-// src/index.ts
-var OpenAIClient = class extends RuntimeClass(OpenAILive) {
+// src/internal/OpenAi.ts
+var make48 = (config) => gen2(function* (_) {
+  const client = (yield* _(effect_platform_Http_Client_esm_exports.Client)).pipe(
+    effect_platform_Http_Client_esm_exports.mapRequest(
+      flow(
+        effect_platform_Http_ClientRequest_esm_exports.prependUrl("https://api.openai.com/v1"),
+        effect_platform_Http_ClientRequest_esm_exports.bearerToken(config.apiKey),
+        config.organization ? effect_platform_Http_ClientRequest_esm_exports.setHeader("OpenAI-Organization", config.organization) : identity
+      )
+    )
+  );
+  const models = effect_platform_Http_ClientRequest_esm_exports.get("/models").pipe(
+    client,
+    flatMap8(effect_platform_Http_ClientResponse_esm_exports.schemaBodyJson(ListResult(Model))),
+    map13((_2) => _2.data)
+  );
+  return { models };
+});
+var OpenAI = Tag("openai-demo/OpenAI");
+var OpenAILive = (config) => effect(OpenAI, make48(config)).pipe(use3(effect_platform_Http_Client_esm_exports.layer));
+var OpenAIClientImpl = class extends RuntimeClass(OpenAILive) {
   constructor(config) {
     super(config);
   }
   models = this.$service(OpenAI, (_) => _.models);
 };
+var createClient = (config) => new OpenAIClientImpl(config);
+var DateFromUnixTime = Int.pipe(
+  transform2(
+    DateFromSelf,
+    (_) => new Date(_ * 1e3),
+    (_) => Math.floor(_.getTime() / 1e3)
+  )
+);
+var ListResult = (schema) => struct3({
+  object: string4,
+  data: array5(schema),
+  has_more: optional(boolean3).withDefault(() => false)
+});
+var ModelId = NonEmpty.pipe(brand("ModelId"));
+var Model = class extends Class2()({
+  id: ModelId,
+  object: string4,
+  created: DateFromUnixTime,
+  owned_by: string4,
+  root: string4,
+  parent: nullable(string4)
+}) {
+};
+
+// src/index.ts
+var createClient2 = createClient;
 
 exports.Model = Model;
 exports.ModelId = ModelId;
-exports.OpenAIClient = OpenAIClient;
+exports.createClient = createClient2;
 //# sourceMappingURL=out.js.map
 //# sourceMappingURL=index.js.map

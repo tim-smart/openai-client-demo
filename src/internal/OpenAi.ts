@@ -4,11 +4,8 @@ import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import { flow, identity } from "effect/Function"
 import * as Layer from "effect/Layer"
-
-export interface OpenAIConfig {
-  readonly apiKey: string
-  readonly organization?: string
-}
+import { OpenAIClient, OpenAIConfig } from ".."
+import { RuntimeClass } from "./RuntimeClass"
 
 const make = (config: OpenAIConfig) =>
   Effect.gen(function* (_) {
@@ -33,11 +30,25 @@ const make = (config: OpenAIConfig) =>
     return { models } as const
   })
 
-export interface OpenAI
-  extends Effect.Effect.Success<ReturnType<typeof make>> {}
-export const OpenAI = Context.Tag<OpenAI>("openai-demo/OpenAI")
-export const OpenAILive = (config: OpenAIConfig) =>
+interface OpenAI extends Effect.Effect.Success<ReturnType<typeof make>> {}
+const OpenAI = Context.Tag<OpenAI>("openai-demo/OpenAI")
+const OpenAILive = (config: OpenAIConfig) =>
   Layer.effect(OpenAI, make(config)).pipe(Layer.use(Http.client.layer))
+
+// client
+
+class OpenAIClientImpl
+  extends RuntimeClass(OpenAILive)
+  implements OpenAIClient
+{
+  constructor(config: OpenAIConfig) {
+    super(config)
+  }
+  models: () => Promise<readonly Model[]> = this.$service(OpenAI, _ => _.models)
+}
+
+export const createClient = (config: OpenAIConfig): OpenAIClient =>
+  new OpenAIClientImpl(config)
 
 // schemas
 

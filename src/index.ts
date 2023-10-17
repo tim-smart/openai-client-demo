@@ -1,11 +1,16 @@
-import { Model, OpenAI, OpenAIConfig, OpenAILive } from "./internal/OpenAi"
-import { RuntimeClass } from "./internal/RuntimeClass"
+import * as internal from "./internal/OpenAi"
+import { Model } from "./internal/OpenAi"
 
-export { OpenAIConfig, Model, ModelId } from "./internal/OpenAi"
+export { Model, ModelId } from "./internal/OpenAi"
 
-export class OpenAIClient extends RuntimeClass(OpenAILive) {
-  constructor(config: OpenAIConfig) {
-    super(config)
-  }
-  models: () => Promise<readonly Model[]> = this.$service(OpenAI, _ => _.models)
+export interface OpenAIConfig {
+  readonly apiKey: string
+  readonly organization?: string
 }
+
+export interface OpenAIClient {
+  models(): Promise<ReadonlyArray<Model>>
+}
+
+export const createClient: (config: OpenAIConfig) => OpenAIClient =
+  internal.createClient

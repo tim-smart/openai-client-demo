@@ -5,6 +5,7 @@ import * as Layer from "effect/Layer"
 import * as Runtime from "effect/Runtime"
 import * as Scope from "effect/Scope"
 
+/** @internal */
 export function RuntimeClass<Args extends Array<any>, RE, R>(
   layer: (...args: Args) => Layer.Layer<never, RE, R>,
 ) {
