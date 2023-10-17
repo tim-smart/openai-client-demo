@@ -19,6 +19,7 @@ const make = (config: OpenAIConfig) =>
             : identity,
         ),
       ),
+      Http.client.filterStatusOk,
     )
 
     const models = Http.request.get("/models").pipe(
