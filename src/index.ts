@@ -5,8 +5,9 @@ export interface OpenAIConfig {
   readonly organization?: string
 }
 
-export interface OpenAIClient {
+export interface OpenAIClient extends AsyncDisposable {
   models(): Promise<ReadonlyArray<Model>>
+  close(): Promise<void>
 }
 
 export const createClient: (config: OpenAIConfig) => OpenAIClient =

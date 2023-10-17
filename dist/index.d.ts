@@ -2,8 +2,9 @@ interface OpenAIConfig {
     readonly apiKey: string;
     readonly organization?: string;
 }
-interface OpenAIClient {
+interface OpenAIClient extends AsyncDisposable {
     models(): Promise<ReadonlyArray<Model>>;
+    close(): Promise<void>;
 }
 declare const createClient: (config: OpenAIConfig) => OpenAIClient;
 interface Model {
